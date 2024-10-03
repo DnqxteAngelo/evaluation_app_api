@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
-    class Department {
+    class College {
         function addCollege($json){
             include "connection.php";
 
@@ -23,8 +23,7 @@ header("Access-Control-Allow-Origin: *");
         function getCollege(){
             include "connection.php";
 
-            $sql = "SELECT tbl_department.dept_name, tbl_college.college_name FROM tbl_college
-                    INNER JOIN tbl_department ON tbl_department.dept_id = tbl_college.college_deptId";
+            $sql = "SELECT college_id, college_name FROM tbl_college";
             $stmt = $conn->prepare($sql);
 
             $stmt->execute();

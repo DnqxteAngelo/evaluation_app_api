@@ -25,7 +25,7 @@ class Transaction {
         include "connection.php";
 
         // Fetch both student and teacher activities in one query
-        $sql = "SELECT * FROM tbl_activities WHERE act_person IN ('S', 'T')";
+        $sql = "SELECT act_id, act_code, act_name, act_person FROM tbl_activities WHERE act_person IN ('S', 'T')";
         $stmt = $conn->prepare($sql);
         
         $stmt->execute();
@@ -39,9 +39,23 @@ class Transaction {
         include "connection.php";
 
         // Fetch both student and teacher activities in one query
-        $sql = "SELECT * FROM tbl_time";
+        $sql = "SELECT time_id, time_range FROM tbl_time";
         $stmt = $conn->prepare($sql);
         
+        $stmt->execute();
+        $returnValue = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = null; $stmt = null;
+
+        return json_encode($returnValue);
+    }
+
+    function countActivityTally($json) {
+        include "connection.php";
+        $json = json_decode($json, true);
+        // Fetch both student and teacher activities in one query
+        $sql = "SELECT trans_actId, COUNT(trans_actId) AS tally FROM tbl_transaction WHERE trans_evalId = :trans_evalId GROUP BY trans_actId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':trans_evalId', $json['trans_evalId']);
         $stmt->execute();
         $returnValue = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $conn = null; $stmt = null;
@@ -63,6 +77,9 @@ switch ($operation) {
         break;
     case "getTimeRange":
         echo $transaction->getTimeRange();
+        break;
+    case "countActivityTally":
+        echo $transaction->countActivityTally($json);
         break;
 }
 ?>

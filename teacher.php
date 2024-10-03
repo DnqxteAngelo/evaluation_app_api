@@ -23,8 +23,7 @@ header("Access-Control-Allow-Origin: *");
         function getTeacher(){
             include "connection.php";
 
-            $sql = "SELECT tbl_department.dept_name, tbl_teacher.teacher_fullname FROM tbl_teacher
-                    INNER JOIN tbl_department ON tbl_department.dept_id = tbl_teacher.teacher_deptId";
+            $sql = "SELECT teacher_id, teacher_fullname FROM tbl_teacher";
             $stmt = $conn->prepare($sql);
 
             $stmt->execute();
