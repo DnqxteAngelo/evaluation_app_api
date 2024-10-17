@@ -24,7 +24,7 @@ class Auth {
 
         $json = json_decode($json, true);
 
-        $sql = "SELECT tbl_user.user_fullname, tbl_department.dept_name, tbl_userrole.role_name
+        $sql = "SELECT tbl_user.user_fullname, tbl_department.dept_id, tbl_department.dept_name, tbl_userrole.role_name
                 FROM tbl_user
                 INNER JOIN tbl_department ON tbl_department.dept_id = tbl_user.user_deptId
                 INNER JOIN tbl_userrole ON tbl_userrole.role_id = tbl_user.user_roleId

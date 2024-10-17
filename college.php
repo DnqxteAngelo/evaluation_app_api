@@ -23,7 +23,9 @@ header("Access-Control-Allow-Origin: *");
         function getCollege(){
             include "connection.php";
 
-            $sql = "SELECT college_id, college_name FROM tbl_college";
+            $sql = "SELECT tbl_college.college_name, tbl_department.dept_name
+                    FROM tbl_college
+                    JOIN tbl_department ON tbl_college.college_deptId = tbl_department.dept_id";
             $stmt = $conn->prepare($sql);
 
             $stmt->execute();

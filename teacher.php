@@ -8,11 +8,22 @@ header("Access-Control-Allow-Origin: *");
 
             $json = json_decode($json, true);
 
-            $sql = "INSERT INTO tbl_teacher(teacher_fullname, teacher_deptId) ";
-            $sql .= "VALUES(:teacher_fullname, :teacher_deptId)";
+            $sql = "INSERT INTO tbl_teacher(teacher_fullname, teacher_collegeId, teacher_totalYears, 
+            teacher_yearHired, teacher_yearReg, teacher_educAttain, teacher_profLicense, 
+            teacher_empStatus, teacher_rank) ";
+            $sql .= "VALUES(:teacher_fullname, :teacher_collegeId, :teacher_totalYears,
+            :teacher_yearHired, :teacher_yearReg, :teacher_educAttain, :teacher_profLicense, 
+            :teacher_empStatus, :teacher_rank )";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(":teacher_fullname", $json['teacher_fullname']);
-            $stmt->bindParam(":teacher_deptId", $json['teacher_deptId']);
+            $stmt->bindParam(":teacher_collegeId", $json['teacher_collegeId']);
+            $stmt->bindParam(":teacher_totalYears", $json['teacher_totalYears']);
+            $stmt->bindParam(":teacher_yearHired", $json['teacher_yearHired']);
+            $stmt->bindParam(":teacher_yearReg", $json['teacher_yearReg']);
+            $stmt->bindParam(":teacher_educAttain", $json['teacher_educAttain']);
+            $stmt->bindParam(":teacher_profLicense", $json['teacher_profLicense']);
+            $stmt->bindParam(":teacher_empStatus", $json['teacher_empStatus']);
+            $stmt->bindParam(":teacher_rank", $json['teacher_rank']);
 
             $stmt->execute();
             $returnValue = $stmt->rowCount() > 0 ? 1 : 0;
@@ -23,7 +34,9 @@ header("Access-Control-Allow-Origin: *");
         function getTeacher(){
             include "connection.php";
 
-            $sql = "SELECT teacher_id, teacher_fullname FROM tbl_teacher";
+            $sql = "SELECT tbl_teacher.teacher_fullname, tbl_college.college_name, tbl_teacher.teacher_empStatus
+                    FROM tbl_teacher
+                    JOIN tbl_college ON tbl_teacher.teacher_collegeId = tbl_college.college_id";
             $stmt = $conn->prepare($sql);
 
             $stmt->execute();
