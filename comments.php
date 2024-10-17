@@ -9,7 +9,7 @@ header("Access-Control-Allow-Origin: *");
             $json = json_decode($json, true);
 
             $sql = "INSERT INTO tbl_comments(comment_evalId, comment_timeId, comment_text) ";
-            $sql .= "VALUES(:comment_evalId, :c, :comment_text)";
+            $sql .= "VALUES(:comment_evalId, :comment_timeId, :comment_text)";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(":comment_evalId", $json['comment_evalId']);
             $stmt->bindParam(":comment_timeId", $json['comment_timeId']);
