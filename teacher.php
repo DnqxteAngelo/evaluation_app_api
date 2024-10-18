@@ -34,7 +34,7 @@ header("Access-Control-Allow-Origin: *");
         function getTeacher(){
             include "connection.php";
 
-            $sql = "SELECT tbl_teacher.teacher_fullname, tbl_college.college_name, tbl_teacher.teacher_empStatus
+            $sql = "SELECT tbl_teacher.teacher_id, tbl_teacher.teacher_fullname, tbl_college.college_name, tbl_teacher.teacher_empStatus
                     FROM tbl_teacher
                     JOIN tbl_college ON tbl_teacher.teacher_collegeId = tbl_college.college_id";
             $stmt = $conn->prepare($sql);
