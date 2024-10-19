@@ -106,6 +106,74 @@ header("Access-Control-Allow-Origin: *");
 
             return json_encode($returnValue);
         }
+
+        function getEvaluationRecords($json){
+            include "connection.php";
+
+            $json = json_decode($json, true);
+
+            $sql = "SELECT 
+                    a.act_id AS trans_actId, 
+                    a.act_name, 
+                    a.act_code, 
+                    a.act_person, 
+                    COALESCE(COUNT(t.trans_actId), 0) AS tally
+                FROM 
+                    tbl_activities a
+                LEFT JOIN 
+                    tbl_transaction t ON a.act_id = t.trans_actId 
+                LEFT JOIN 
+                    tbl_evaluation e ON t.trans_evalId = e.eval_id
+                WHERE 
+                    e.eval_periodId = :eval_periodId
+                    AND e.eval_teacherId = :eval_teacherId
+                    AND e.eval_semesterId = :eval_semesterId 
+                    AND e.eval_schoolyearId = :eval_schoolyearId
+                GROUP BY 
+                    a.act_id, a.act_name, a.act_code, a.act_person;
+                ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':eval_periodId', $json['eval_periodId']);
+            $stmt->bindParam(':eval_teacherId', $json['eval_teacherId']);
+            $stmt->bindParam(':eval_semesterId', $json['eval_semesterId']);
+            $stmt->bindParam(':eval_schoolyearId', $json['eval_schoolyearId']);
+            $stmt->execute();
+            $returnValue = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $conn = null; $stmt = null;
+
+            return json_encode($returnValue);
+        }
+
+        function getEvaluationDetails($json){
+            include "connection.php";
+
+            $json = json_decode($json, true);
+
+            $sql = "SELECT  
+                    te.teacher_fullname, 
+                    e.eval_subject, 
+                    e.eval_date
+                FROM 
+                    tbl_evaluation e
+                LEFT JOIN 
+                    tbl_teacher te ON e.eval_teacherId = te.teacher_id
+                WHERE 
+                    e.eval_periodId = :eval_periodId
+                    AND e.eval_teacherId = :eval_teacherId
+                    AND e.eval_semesterId = :eval_semesterId
+                    AND e.eval_schoolyearId = :eval_schoolyearId
+                ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':eval_periodId', $json['eval_periodId']);
+            $stmt->bindParam(':eval_teacherId', $json['eval_teacherId']);
+            $stmt->bindParam(':eval_semesterId', $json['eval_semesterId']);
+            $stmt->bindParam(':eval_schoolyearId', $json['eval_schoolyearId']);
+            $stmt->execute();
+            $returnValue = $stmt->fetch(PDO::FETCH_ASSOC);
+            $conn = null; $stmt = null;
+
+            return json_encode($returnValue);
+        }
     }
 
     $json = isset($_POST['json']) ? $_POST['json'] : "";
@@ -130,6 +198,12 @@ header("Access-Control-Allow-Origin: *");
             break;
         case "getEvaluation":
             echo $evaluation->getEvaluation($json);
+            break;
+        case "getEvaluationRecords":
+            echo $evaluation->getEvaluationRecords($json);
+            break;
+        case "getEvaluationDetails":
+            echo $evaluation->getEvaluationDetails($json);
             break;
     }
 
