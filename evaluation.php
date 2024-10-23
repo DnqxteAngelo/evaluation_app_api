@@ -113,24 +113,28 @@ header("Access-Control-Allow-Origin: *");
             $json = json_decode($json, true);
 
             $sql = "SELECT 
-                    a.act_id AS trans_actId, 
-                    a.act_name, 
-                    a.act_code, 
-                    a.act_person, 
-                    COALESCE(COUNT(t.trans_actId), 0) AS tally
-                FROM 
-                    tbl_activities a
-                LEFT JOIN 
-                    tbl_transaction t ON a.act_id = t.trans_actId 
-                LEFT JOIN 
-                    tbl_evaluation e ON t.trans_evalId = e.eval_id
-                WHERE 
-                    e.eval_periodId = :eval_periodId
-                    AND e.eval_teacherId = :eval_teacherId
-                    AND e.eval_semesterId = :eval_semesterId 
-                    AND e.eval_schoolyearId = :eval_schoolyearId
-                GROUP BY 
-                    a.act_id, a.act_name, a.act_code, a.act_person;
+                        a.act_id AS trans_actId, 
+                        a.act_name, 
+                        a.act_code, 
+                        a.act_person, 
+                        COALESCE(SUM(
+                            CASE 
+                                WHEN e.eval_periodId = :eval_periodId 
+                                AND e.eval_teacherId = :eval_teacherId 
+                                AND e.eval_semesterId = :eval_semesterId  
+                                AND e.eval_schoolyearId = :eval_schoolyearId 
+                                THEN 1 
+                                ELSE 0 
+                            END
+                        ), 0) AS tally
+                    FROM 
+                        tbl_activities a
+                    LEFT JOIN 
+                        tbl_transaction t ON a.act_id = t.trans_actId
+                    LEFT JOIN 
+                        tbl_evaluation e ON t.trans_evalId = e.eval_id
+                    GROUP BY 
+                        a.act_id, a.act_name, a.act_code, a.act_person;
                 ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':eval_periodId', $json['eval_periodId']);
